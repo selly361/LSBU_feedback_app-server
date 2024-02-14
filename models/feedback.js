@@ -25,6 +25,10 @@ const feedbackSchema = Schema(
 			type: String,
 			default: ''
 		},
+		tutorial: {
+			type: Schema.Types.ObjectId,
+			ref: 'Tutorial'
+		},
 		likes: {
 			count: {
 				type: Number,
