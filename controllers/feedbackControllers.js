@@ -1,6 +1,5 @@
 import Feedback from '../models/feedback.js'
 
-
 const getAllFeedbacks = async (req, res) => {
 	try {
 		const feedbacks = await Feedback.find()
@@ -9,7 +8,6 @@ const getAllFeedbacks = async (req, res) => {
 		res.status(500).json({ message: error.message })
 	}
 }
-
 
 const getFeedback = async (req, res) => {
 	const { id } = req.params
@@ -22,7 +20,6 @@ const getFeedback = async (req, res) => {
 	}
 }
 
-
 const likeFeedback = async (req, res) => {
 	const { id } = req.params
 	const { username } = req.body
@@ -30,34 +27,36 @@ const likeFeedback = async (req, res) => {
 	try {
 		const feedback = await Feedback.findById(id)
 
-		if (
-			!feedback.likes.users.includes(username) &&
-			!feedback.dislikes.users.includes(username)
-		) {
-			feedback.likes.count += 1
-			feedback.likes.users.push(username)
+		if (feedback.likes.users.contains(username)) {
+			feedback.likes.users = feedback.likes.users.filter((user) => user !== username)
+			feedback.likes.count -= 1
 
-			const dislikeIndex = feedback.dislikes.users.indexOf(username)
-			if (dislikeIndex !== -1) {
-				feedback.dislikes.count -= 1
-				feedback.dislikes.users.splice(dislikeIndex, 1)
-			}
+			const newFeedback = await feedback.save()
 
-			const updatedFeedback = await feedback.save()
-			res.status(200).json(updatedFeedback)
-		} else if (feedback.dislikes.users.includes(username)) {
-			feedback.likes.count += 1
-			feedback.likes.users.push(username)
-
-			const dislikeIndex = feedback.dislikes.users.indexOf(username)
+			res.status(200).json(newFeedback)
+		} 
+		
+		else if (feedback.dislikes.users.contains(username)) {
+			feedback.dislikes.users = feedback.dislikes.users.filter((user) => user !== username)
 			feedback.dislikes.count -= 1
-			feedback.dislikes.users.splice(dislikeIndex, 1)
 
-			const updatedFeedback = await feedback.save()
-			res.status(200).json(updatedFeedback)
-		} else {
-			res.status(400).json({ message: 'User has already liked this feedback.' })
+			feedback.likes.users = [...feedback.likes.users, username]
+			feedback.likes.count += 1
+
+			const newFeedback = await feedback.save()
+
+			res.status(200).json(newFeedback)
+		} 
+		
+		else {
+			feedback.likes.users = [...feedback.likes.users, username]
+			feedback.likes.count += 1
+			const newFeedback = await feedback.save()
+			console.log(newFeedback)
+
+			res.status(200).json(newFeedback)
 		}
+
 	} catch (error) {
 		res.status(409).json({ message: error.message })
 	}
@@ -70,36 +69,36 @@ const dislikeFeedback = async (req, res) => {
 	try {
 		const feedback = await Feedback.findById(id)
 
-		if (
-			!feedback.likes.users.includes(username) &&
-			!feedback.dislikes.users.includes(username)
-		) {
-			feedback.dislikes.count += 1
-			feedback.dislikes.users.push(username)
+		if (feedback.dislikes.users.contains(username)) {
+			feedback.dislikes.users = feedback. dislikes.users.filter((user) => user !== username)
+			feedback.dislikes.count -= 1
 
-			const likeIndex = feedback.likes.users.indexOf(username)
-			if (likeIndex !== -1) {
-				feedback.likes.count -= 1
-				feedback.likes.users.splice(likeIndex, 1)
-			}
+			const newFeedback = await feedback.save()
 
-			const updatedFeedback = await feedback.save()
-			res.status(200).json(updatedFeedback)
-		} else if (feedback.likes.users.includes(username)) {
-			feedback.dislikes.count += 1
-			feedback.dislikes.users.push(username)
+			res.status(200).json(newFeedback)
 
-			const likeIndex = feedback.likes.users.indexOf(username)
+		} 
+		
+		else if (feedback.likes.users.contains(username)) {
+			feedback.likes.users = feedback.likes.users.filter((user) => user !== username)
 			feedback.likes.count -= 1
-			feedback.likes.users.splice(likeIndex, 1)
 
-			const updatedFeedback = await feedback.save()
-			res.status(200).json(updatedFeedback)
-		} else {
-			res
-				.status(400)
-				.json({ message: 'User has already disliked this feedback.' })
+			feedback.dislikes.users = [...feedback.dislikes.users, username]
+			feedback.dislikes.count += 1
+
+			const newFeedback = await feedback.save()
+
+			res.status(200).json(newFeedback)
+		} 
+		
+		else {
+			feedback.dislikes.users = [...feedback.dislikes.users, username]
+			feedback.dislikes.count += 1
+			const newFeedback = await feedback.save()
+			console.log(newFeedback)
+			res.status(200).json(newFeedback)
 		}
+
 	} catch (error) {
 		res.status(409).json({ message: error.message })
 	}
@@ -172,4 +171,12 @@ const addReply = async (req, res) => {
 	}
 }
 
-export { getAllFeedbacks, likeFeedback, dislikeFeedback, addFeedback, addComment, addReply, getFeedback }
+export {
+	getAllFeedbacks,
+	likeFeedback,
+	dislikeFeedback,
+	addFeedback,
+	addComment,
+	addReply,
+	getFeedback
+}
