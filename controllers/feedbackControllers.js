@@ -36,7 +36,7 @@ const likeFeedback = async (req, res) => {
 			res.status(200).json(newFeedback)
 		} 
 		
-		else if (feedback.dislikes.users.include(username)) {
+		else if (feedback.dislikes.users.includes(username)) {
 			feedback.dislikes.users = feedback.dislikes.users.filter((user) => user !== username)
 			feedback.dislikes.count -= 1
 
