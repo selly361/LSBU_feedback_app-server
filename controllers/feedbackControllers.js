@@ -27,7 +27,7 @@ const likeFeedback = async (req, res) => {
 	try {
 		const feedback = await Feedback.findById(id)
 
-		if (feedback.likes.users.contains(username)) {
+		if (feedback.likes.users.includes(username)) {
 			feedback.likes.users = feedback.likes.users.filter((user) => user !== username)
 			feedback.likes.count -= 1
 
@@ -36,7 +36,7 @@ const likeFeedback = async (req, res) => {
 			res.status(200).json(newFeedback)
 		} 
 		
-		else if (feedback.dislikes.users.contains(username)) {
+		else if (feedback.dislikes.users.include(username)) {
 			feedback.dislikes.users = feedback.dislikes.users.filter((user) => user !== username)
 			feedback.dislikes.count -= 1
 
@@ -69,7 +69,7 @@ const dislikeFeedback = async (req, res) => {
 	try {
 		const feedback = await Feedback.findById(id)
 
-		if (feedback.dislikes.users.contains(username)) {
+		if (feedback.dislikes.users.includes(username)) {
 			feedback.dislikes.users = feedback. dislikes.users.filter((user) => user !== username)
 			feedback.dislikes.count -= 1
 
@@ -79,7 +79,7 @@ const dislikeFeedback = async (req, res) => {
 
 		} 
 		
-		else if (feedback.likes.users.contains(username)) {
+		else if (feedback.likes.users.includes(username)) {
 			feedback.likes.users = feedback.likes.users.filter((user) => user !== username)
 			feedback.likes.count -= 1
 
